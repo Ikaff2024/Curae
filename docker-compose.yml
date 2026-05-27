@@ -1,0 +1,105 @@
+version: '3.9'
+
+services:
+
+  # ── Base de données PostgreSQL ────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: curae_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: curae_db
+      POSTGRES_USER: curae_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-curae_secret_2025}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U curae_user -d curae_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - curae_network
+
+  # ── Backend Node.js ───────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: curae_backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DATABASE_URL: postgresql://curae_user:${DB_PASSWORD:-curae_secret_2025}@postgres:5432/curae_db
+      JWT_SECRET: ${JWT_SECRET:-changez_ce_secret_en_production}
+      JWT_EXPIRES_IN: 7d
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost}
+      WHATSAPP_TOKEN: ${WHATSAPP_TOKEN:-}
+      WHATSAPP_PHONE_ID: ${WHATSAPP_PHONE_ID:-}
+      WHATSAPP_VERIFY_TOKEN: ${WHATSAPP_VERIFY_TOKEN:-curae_webhook}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      WAVE_API_KEY: ${WAVE_API_KEY:-}
+    ports:
+      - "4000:4000"
+    networks:
+      - curae_network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:4000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ── Frontend React + Nginx ────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:-}
+    container_name: curae_frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - curae_network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # ── Cron — rappels WhatsApp automatiques ─────────────────────────
+  cron:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: curae_cron
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://curae_user:${DB_PASSWORD:-curae_secret_2025}@postgres:5432/curae_db
+      WHATSAPP_TOKEN: ${WHATSAPP_TOKEN:-}
+      WHATSAPP_PHONE_ID: ${WHATSAPP_PHONE_ID:-}
+    # Rappels à 18h00 chaque jour (heure Abidjan = UTC)
+    command: sh -c "echo '0 18 * * * node dist/lib/rappels.js >> /var/log/rappels.log 2>&1' | crontab - && crond -f"
+    networks:
+      - curae_network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  curae_network:
+    driver: bridge

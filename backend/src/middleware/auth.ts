@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken'
 
 export interface AuthRequest extends Request {
   medecinId?: string
+  organisationId?: string
 }
 
 export function authMiddleware(req: AuthRequest, res: Response, next: NextFunction) {
@@ -13,8 +14,9 @@ export function authMiddleware(req: AuthRequest, res: Response, next: NextFuncti
 
   const token = header.slice(7)
   try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET!) as { medecinId: string }
+    const payload = jwt.verify(token, process.env.JWT_SECRET!) as { medecinId: string; organisationId?: string }
     req.medecinId = payload.medecinId
+    req.organisationId = payload.organisationId
     next()
   } catch {
     res.status(401).json({ error: 'Token invalide ou expiré' })

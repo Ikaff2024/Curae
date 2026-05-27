@@ -39,10 +39,15 @@ async function http<T>(path: string, options?: RequestInit): Promise<T> {
 export const api = {
   auth: {
     login:    (email: string, password: string) =>
-      http<{ token: string; medecin: any }>('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
-    register: (data: { email: string; password: string; nom: string; prenoms?: string; specialite?: string; telephone?: string }) =>
-      http<{ token: string; medecin: any }>('/auth/register', { method: 'POST', body: JSON.stringify(data) }),
+      http<{ token: string; medecin: any; organisation: any }>('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
+    register: (data: any) =>
+      http<{ token: string; medecin: any; organisation: any }>('/auth/register', { method: 'POST', body: JSON.stringify(data) }),
     me: () => http<any>('/auth/me'),
+  },
+
+  organisation: {
+    me:     () => http<any>('/organisation/me'),
+    update: (data: any) => http<any>('/organisation/me', { method: 'PUT', body: JSON.stringify(data) }),
   },
 
   patients: {

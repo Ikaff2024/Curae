@@ -32,7 +32,7 @@ const PAGE_TITLES: Record<Page, string> = {
 }
 
 export default function App() {
-  const { user, isAuthenticated, isLoading, logout } = useAuth()
+  const { user, organisation, isAuthenticated, isLoading, logout } = useAuth()
   const offlineSync = useOfflineSync()
   const [page, setPage] = useState<Page>('dashboard')
   const [consultationPatient, setConsultationPatient] = useState<Patient | null>(null)
@@ -63,12 +63,12 @@ export default function App() {
     prenom: user?.prenoms?.split(' ')[0] || user?.nom || '',
     nom: user?.nom || '',
     specialite: user?.specialite || 'Médecin',
-    ville: 'Abidjan',
+    ville: organisation?.ville || 'Abidjan',
     pays: "Côte d'Ivoire",
     telephone: user?.telephone || '',
     email: user?.email || '',
     numeroOrdre: '',
-    cabinet: `Cabinet ${user?.specialite || 'Médical'}`,
+    cabinet: organisation?.nom || `Cabinet ${user?.specialite || 'Médical'}`,
     adresseCabinet: '',
   }
 
