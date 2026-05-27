@@ -88,7 +88,7 @@ export default function ParamètresPage({ profile, onSave }: Props) {
   }
 
   return (
-    <div style={{ padding: '28px 36px', maxWidth: 900, boxSizing: 'border-box' }}>
+    <div className="dashboard-content" style={{ padding: '28px 36px', maxWidth: 900, boxSizing: 'border-box' }}>
 
       {/* En-tête */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28 }}>

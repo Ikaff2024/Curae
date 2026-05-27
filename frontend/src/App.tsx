@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import {
   Users, Calendar, FileText, BarChart2,
-  Settings, LogOut, Heart, Loader2, LayoutDashboard,
+  Settings, LogOut, Heart, Loader2, LayoutDashboard, Menu, X,
 } from 'lucide-react'
 import { useAuth } from './contexts/AuthContext'
 import LoginPage from './pages/LoginPage'
@@ -14,6 +14,7 @@ import ParamètresPage, { type DocteurProfile } from './pages/ParamètresPage'
 import DashboardPage from './pages/DashboardPage'
 import OfflineBanner from './components/ui/OfflineBanner'
 import { useOfflineSync } from './hooks/useOfflineSync'
+import { useIsMobile } from './hooks/useIsMobile'
 import type { Patient } from './types'
 
 type Page = 'dashboard' | 'patients' | 'agenda' | 'comptes-rendus' | 'facturation' | 'parametres'
@@ -34,9 +35,16 @@ const PAGE_TITLES: Record<Page, string> = {
 export default function App() {
   const { user, organisation, isAuthenticated, isLoading, logout } = useAuth()
   const offlineSync = useOfflineSync()
+  const isMobile = useIsMobile()
   const [page, setPage] = useState<Page>('dashboard')
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const [consultationPatient, setConsultationPatient] = useState<Patient | null>(null)
   const [profile, setProfile] = useState<DocteurProfile | null>(null)
+
+  function navigate(p: Page) {
+    setPage(p)
+    setSidebarOpen(false)
+  }
 
   // Spinner de chargement initial (vérification token)
   if (isLoading) {
@@ -107,8 +115,13 @@ export default function App() {
       '--accent-light': '#e8f4f0',
     } as React.CSSProperties}>
 
+      {/* Mobile backdrop */}
+      {isMobile && sidebarOpen && (
+        <div className="sidebar-backdrop" onClick={() => setSidebarOpen(false)} />
+      )}
+
       {/* Sidebar */}
-      <aside style={{
+      <aside className={`app-sidebar${isMobile && sidebarOpen ? ' open' : ''}`} style={{
         width: 240, flexShrink: 0,
         background: 'var(--surface)',
         borderRight: '1px solid var(--border)',
@@ -142,7 +155,7 @@ export default function App() {
 
         {/* Profil médecin */}
         <button
-          onClick={() => setPage('parametres')}
+          onClick={() => navigate('parametres')}
           style={{
             margin: '8px 12px 16px',
             padding: '12px 14px',
@@ -177,7 +190,7 @@ export default function App() {
           {navItems.map(item => (
             <button
               key={item.id}
-              onClick={() => setPage(item.id)}
+              onClick={() => navigate(item.id)}
               style={navBtnStyle(item.id)}
               onMouseEnter={e => { if (page !== item.id) (e.currentTarget as HTMLButtonElement).style.background = 'var(--bg)' }}
               onMouseLeave={e => { if (page !== item.id) (e.currentTarget as HTMLButtonElement).style.background = 'transparent' }}
@@ -191,7 +204,7 @@ export default function App() {
         {/* Bas sidebar */}
         <div style={{ padding: '0 8px', borderTop: '1px solid var(--border)', paddingTop: 12, marginTop: 8 }}>
           <button
-            onClick={() => setPage('parametres')}
+            onClick={() => navigate('parametres')}
             style={{ ...navBtnStyle('parametres'), color: page === 'parametres' ? 'var(--accent)' : 'var(--muted)' }}
             onMouseEnter={e => { if (page !== 'parametres') (e.currentTarget as HTMLButtonElement).style.background = 'var(--bg)' }}
             onMouseLeave={e => { if (page !== 'parametres') (e.currentTarget as HTMLButtonElement).style.background = 'transparent' }}
@@ -216,29 +229,48 @@ export default function App() {
       </aside>
 
       {/* Zone principale */}
-      <main style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+      <main className="app-main" style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         {/* Topbar */}
         <div style={{
-          padding: '18px 36px',
+          padding: isMobile ? '14px 16px' : '18px 36px',
           borderBottom: '1px solid var(--border)',
           background: 'var(--surface)',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          flexShrink: 0,
+          flexShrink: 0, gap: 12,
         }}>
-          <div>
-            <h1 style={{ margin: 0, fontSize: 20, fontWeight: 800, letterSpacing: '-0.02em' }}>
-              {PAGE_TITLES[page]}
-            </h1>
-            <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 2 }}>
-              {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+          <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 12 : 0 }}>
+            {isMobile && (
+              <button
+                onClick={() => setSidebarOpen(o => !o)}
+                style={{
+                  width: 36, height: 36, borderRadius: 9,
+                  border: 'none', background: 'var(--bg)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  cursor: 'pointer', flexShrink: 0, color: 'var(--text)',
+                }}
+              >
+                {sidebarOpen ? <X size={18} /> : <Menu size={18} />}
+              </button>
+            )}
+            <div>
+              <h1 style={{ margin: 0, fontSize: isMobile ? 16 : 20, fontWeight: 800, letterSpacing: '-0.02em' }}>
+                {PAGE_TITLES[page]}
+              </h1>
+              {!isMobile && (
+                <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 2 }}>
+                  {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                </div>
+              )}
             </div>
           </div>
-          <div style={{
-            padding: '7px 16px', background: 'var(--accent-light)',
-            borderRadius: 8, fontSize: 13, color: 'var(--accent)', fontWeight: 600,
-          }}>
-            {activeProfile.titre} {activeProfile.prenom} {activeProfile.nom}
-          </div>
+          {!isMobile && (
+            <div style={{
+              padding: '7px 16px', background: 'var(--accent-light)',
+              borderRadius: 8, fontSize: 13, color: 'var(--accent)', fontWeight: 600,
+            }}>
+              {activeProfile.titre} {activeProfile.prenom} {activeProfile.nom}
+            </div>
+          )}
         </div>
 
         {/* Contenu scrollable */}
@@ -258,6 +290,26 @@ export default function App() {
           )}
         </div>
       </main>
+
+      {/* Bottom navigation — mobile only */}
+      <nav className="bottom-nav">
+        {[
+          { id: 'dashboard'      as Page, icon: <LayoutDashboard size={20} />, label: 'Accueil' },
+          { id: 'patients'       as Page, icon: <Users size={20} />,           label: 'Patients' },
+          { id: 'agenda'         as Page, icon: <Calendar size={20} />,        label: 'Agenda' },
+          { id: 'comptes-rendus' as Page, icon: <FileText size={20} />,        label: 'CR' },
+          { id: 'facturation'    as Page, icon: <BarChart2 size={20} />,       label: 'Factures' },
+        ].map(item => (
+          <button
+            key={item.id}
+            className={`bottom-nav-btn${page === item.id ? ' active' : ''}`}
+            onClick={() => navigate(item.id)}
+          >
+            {item.icon}
+            <span>{item.label}</span>
+          </button>
+        ))}
+      </nav>
 
       <style>{`@keyframes spin { from { transform: rotate(0deg) } to { transform: rotate(360deg) } }`}</style>
     </div>

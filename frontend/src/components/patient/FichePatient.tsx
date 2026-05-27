@@ -449,7 +449,7 @@ export default function FichePatient({ onStartConsultation }: FichePatientProps)
   }
 
   return (
-    <div style={{ padding: '28px 36px' }}>
+    <div className="dashboard-content" style={{ padding: '28px 36px' }}>
       {offline && (
         <div style={{
           display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16,

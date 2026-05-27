@@ -244,7 +244,7 @@ export default function DashboardPage() {
   const aboExpireBientot = joursRestants !== null && joursRestants <= 30
 
   return (
-    <div style={{ padding: '28px 36px', display: 'flex', flexDirection: 'column', gap: 24 }}>
+    <div className="dashboard-content" style={{ padding: '28px 36px', display: 'flex', flexDirection: 'column', gap: 24 }}>
 
       {/* Bannière offline */}
       {offline && (
@@ -281,7 +281,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Stat cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
+      <div className="grid-stats-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
         <StatCard
           label="Patients suivis" icon={<Users size={18} />} couleur="#0f6e56"
           value={d.patients.total}
@@ -309,7 +309,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Ligne 2 : revenus + RDV + risque */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px 340px', gap: 16 }}>
+      <div className="grid-dashboard-main" style={{ display: 'grid', gridTemplateColumns: '1fr 280px 340px', gap: 16 }}>
 
         {/* Graphique revenus */}
         <div style={{
@@ -454,6 +454,7 @@ export default function DashboardPage() {
         border: `1px solid ${aboExpireBientot ? '#f59e0b' : '#86efac'}`,
         borderRadius: 12, padding: '16px 20px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16,
+        flexWrap: 'wrap',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <div style={{

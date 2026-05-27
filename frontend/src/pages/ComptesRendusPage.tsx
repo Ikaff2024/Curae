@@ -574,7 +574,7 @@ export default function ComptesRendusPage() {
   })
 
   return (
-    <div style={{ padding: '28px 36px', height: '100%', boxSizing: 'border-box' }}>
+    <div className="dashboard-content" style={{ padding: '28px 36px', height: '100%', boxSizing: 'border-box' }}>
 
       {/* Stats */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 28 }}>

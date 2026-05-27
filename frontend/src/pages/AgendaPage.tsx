@@ -169,7 +169,7 @@ export default function AgendaPage() {
   }
 
   return (
-    <div style={{ padding: '28px 36px', height: '100%', boxSizing: 'border-box' }}>
+    <div className="dashboard-content" style={{ padding: '28px 36px', height: '100%', boxSizing: 'border-box' }}>
 
       {/* Layout principal : calendrier + liste côte à côte */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: 24, height: '100%' }}>
