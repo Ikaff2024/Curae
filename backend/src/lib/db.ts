@@ -1,4 +1,9 @@
 import { Pool } from 'pg'
+import dotenv from 'dotenv'
+
+// dotenv doit être chargé AVANT la création du Pool
+// (les imports ES/TS sont hoistés, donc l'appel dans index.ts arrive trop tard)
+dotenv.config()
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
