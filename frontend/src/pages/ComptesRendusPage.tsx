@@ -546,7 +546,7 @@ function ModalVoir({ cr, onFermer }: { cr: CompteRendu; onFermer: () => void }) 
 
 // ─── Page principale ────────────────────────────────────────────────────────
 export default function ComptesRendusPage() {
-  const [crs, setCrs] = useState<CompteRendu[]>(MOCK_CRS)
+  const [crs, setCrs] = useState<CompteRendu[]>([])
   const [loading, setLoading] = useState(true)
   const [showNouveauCR, setShowNouveauCR] = useState(false)
   const [recherche, setRecherche] = useState('')
@@ -557,8 +557,8 @@ export default function ComptesRendusPage() {
 
   useEffect(() => {
     api.cr.list()
-      .then(list => { if (list.length > 0) setCrs(list.map(mapCR)) })
-      .catch(() => {})
+      .then(list => setCrs(list.map(mapCR)))
+      .catch(() => setCrs(MOCK_CRS))
       .finally(() => setLoading(false))
   }, [])
 

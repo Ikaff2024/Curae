@@ -143,6 +143,9 @@ export default function AgendaPage() {
   const [patients, setPatients] = useState<Patient[]>(patientsDemo)
   const [loading, setLoading] = useState(true)
   const [whatsappRdv, setWhatsappRdv] = useState<{ id: string; nom: string; type: 'confirmation' | 'rappel' | 'annulation' } | null>(null)
+  const [showNouveauRDV, setShowNouveauRDV] = useState(false)
+  const [rdvForm, setRdvForm] = useState({ patientId: '', motif: '', heure: '09:00', dureeMinutes: 30, notes: '' })
+  const [rdvSaving, setRdvSaving] = useState(false)
 
   useEffect(() => {
     Promise.all([
@@ -166,6 +169,32 @@ export default function AgendaPage() {
   }
   function nextWeek() {
     const d = new Date(currentDate); d.setDate(d.getDate() + 7); setCurrentDate(d)
+  }
+
+  async function handleSaveRDV(e: React.FormEvent) {
+    e.preventDefault()
+    if (!rdvForm.patientId) return
+    setRdvSaving(true)
+    try {
+      const dateStr = selectedDay.toISOString().slice(0, 10)
+      const newRdv = await api.rdv.create({
+        patient_id: rdvForm.patientId,
+        date: dateStr,
+        heure: rdvForm.heure,
+        duree_minutes: rdvForm.dureeMinutes,
+        motif: rdvForm.motif,
+        notes: rdvForm.notes,
+        statut: 'confirme',
+      })
+      const patient = patients.find(p => p.id === rdvForm.patientId)
+      setRdvList(prev => [...prev, { ...mapRdv(newRdv), nom: patient?.nom, prenoms: patient?.prenoms, telephone: patient?.telephone }])
+      setShowNouveauRDV(false)
+      setRdvForm({ patientId: '', motif: '', heure: '09:00', dureeMinutes: 30, notes: '' })
+    } catch (err) {
+      console.error('[RDV create]', err)
+    } finally {
+      setRdvSaving(false)
+    }
   }
 
   return (
@@ -292,12 +321,14 @@ export default function AgendaPage() {
               <div style={{ fontWeight: 700, fontSize: 14 }}>
                 {selectedDay.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
               </div>
-              <button style={{
-                display: 'flex', alignItems: 'center', gap: 6,
-                background: 'var(--accent)', color: '#fff',
-                border: 'none', borderRadius: 7, padding: '7px 14px',
-                fontSize: 12, fontWeight: 600, cursor: 'pointer',
-              }}>
+              <button
+                onClick={() => setShowNouveauRDV(true)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  background: 'var(--accent)', color: '#fff',
+                  border: 'none', borderRadius: 7, padding: '7px 14px',
+                  fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                }}>
                 <Plus size={13} /> Ajouter un RDV
               </button>
             </div>
@@ -381,6 +412,77 @@ export default function AgendaPage() {
           type={whatsappRdv.type}
           patientNom={whatsappRdv.nom}
         />
+      )}
+
+      {/* Modal Nouveau RDV */}
+      {showNouveauRDV && (
+        <div style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: 1000, padding: 16,
+        }} onClick={() => setShowNouveauRDV(false)}>
+          <div style={{
+            background: '#fff', borderRadius: 16, width: '100%', maxWidth: 480,
+            boxShadow: '0 20px 60px rgba(0,0,0,0.2)', overflow: 'hidden',
+          }} onClick={e => e.stopPropagation()}>
+            {/* Header */}
+            <div style={{ background: 'var(--accent)', padding: '18px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div>
+                <div style={{ color: '#fff', fontWeight: 800, fontSize: 16 }}>Nouveau rendez-vous</div>
+                <div style={{ color: 'rgba(255,255,255,0.75)', fontSize: 13, marginTop: 2 }}>
+                  {selectedDay.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
+                </div>
+              </div>
+              <button onClick={() => setShowNouveauRDV(false)} style={{ background: 'rgba(255,255,255,0.15)', border: 'none', borderRadius: 8, width: 32, height: 32, cursor: 'pointer', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>×</button>
+            </div>
+            {/* Form */}
+            <form onSubmit={handleSaveRDV} style={{ padding: '24px' }}>
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#555', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Patient *</label>
+                <select
+                  required value={rdvForm.patientId}
+                  onChange={e => setRdvForm(f => ({ ...f, patientId: e.target.value }))}
+                  style={{ width: '100%', padding: '10px 14px', fontSize: 14, borderRadius: 9, border: '1.5px solid #e8e8e4', background: '#fafaf8', fontFamily: 'inherit' }}
+                >
+                  <option value="">— Sélectionner un patient —</option>
+                  {patients.map(p => <option key={p.id} value={p.id}>{p.nom} {p.prenoms}</option>)}
+                </select>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#555', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Heure</label>
+                  <input type="time" value={rdvForm.heure}
+                    onChange={e => setRdvForm(f => ({ ...f, heure: e.target.value }))}
+                    style={{ width: '100%', padding: '10px 14px', fontSize: 14, borderRadius: 9, border: '1.5px solid #e8e8e4', background: '#fafaf8', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#555', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Durée (min)</label>
+                  <select value={rdvForm.dureeMinutes}
+                    onChange={e => setRdvForm(f => ({ ...f, dureeMinutes: parseInt(e.target.value) }))}
+                    style={{ width: '100%', padding: '10px 14px', fontSize: 14, borderRadius: 9, border: '1.5px solid #e8e8e4', background: '#fafaf8', fontFamily: 'inherit' }}>
+                    {[15, 20, 30, 45, 60, 90].map(d => <option key={d} value={d}>{d} min</option>)}
+                  </select>
+                </div>
+              </div>
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#555', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Motif</label>
+                <input value={rdvForm.motif} onChange={e => setRdvForm(f => ({ ...f, motif: e.target.value }))}
+                  placeholder="Consultation de contrôle, bilan annuel…"
+                  style={{ width: '100%', padding: '10px 14px', fontSize: 14, borderRadius: 9, border: '1.5px solid #e8e8e4', background: '#fafaf8', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+              </div>
+              <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 8 }}>
+                <button type="button" onClick={() => setShowNouveauRDV(false)}
+                  style={{ padding: '10px 20px', borderRadius: 9, border: '1.5px solid #e8e8e4', background: 'transparent', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
+                  Annuler
+                </button>
+                <button type="submit" disabled={rdvSaving}
+                  style={{ padding: '10px 24px', borderRadius: 9, border: 'none', background: rdvSaving ? '#a0c8be' : 'var(--accent)', color: '#fff', fontSize: 14, fontWeight: 700, cursor: rdvSaving ? 'not-allowed' : 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 8 }}>
+                  {rdvSaving ? <><Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} /> Enregistrement…</> : '+ Enregistrer le RDV'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </div>
   )
