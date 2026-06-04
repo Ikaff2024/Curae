@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Users, Calendar, FileText, BarChart2,
   Settings, LogOut, Heart, Loader2, LayoutDashboard, Menu, X,
@@ -13,9 +13,12 @@ import ConsultationPage from './pages/ConsultationPage'
 import ParamètresPage, { type DocteurProfile } from './pages/ParamètresPage'
 import DashboardPage from './pages/DashboardPage'
 import OfflineBanner from './components/ui/OfflineBanner'
+import GuidePriseEnMain, { BoutonAide } from './components/ui/GuidePriseEnMain'
 import { useOfflineSync } from './hooks/useOfflineSync'
 import { useIsMobile } from './hooks/useIsMobile'
 import type { Patient } from './types'
+
+const GUIDE_KEY = 'curae_guide_done'
 
 type Page = 'dashboard' | 'patients' | 'agenda' | 'comptes-rendus' | 'facturation' | 'parametres'
 
@@ -40,10 +43,24 @@ export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [consultationPatient, setConsultationPatient] = useState<Patient | null>(null)
   const [profile, setProfile] = useState<DocteurProfile | null>(null)
+  const [showGuide, setShowGuide] = useState(false)
+
+  // Ouvrir le guide automatiquement au premier login (après auth réussie)
+  useEffect(() => {
+    if (isAuthenticated && !localStorage.getItem(GUIDE_KEY)) {
+      const t = setTimeout(() => setShowGuide(true), 800)
+      return () => clearTimeout(t)
+    }
+  }, [isAuthenticated])
 
   function navigate(p: Page) {
     setPage(p)
     setSidebarOpen(false)
+  }
+
+  function fermerGuide() {
+    localStorage.setItem(GUIDE_KEY, '1')
+    setShowGuide(false)
   }
 
   // Spinner de chargement initial (vérification token)
@@ -290,6 +307,17 @@ export default function App() {
           )}
         </div>
       </main>
+
+      {/* Bouton d'aide flottant */}
+      <BoutonAide onClick={() => setShowGuide(true)} />
+
+      {/* Guide de prise en main */}
+      {showGuide && (
+        <GuidePriseEnMain
+          onNavigate={navigate}
+          onClose={fermerGuide}
+        />
+      )}
 
       {/* Bottom navigation — mobile only */}
       <nav className="bottom-nav">
