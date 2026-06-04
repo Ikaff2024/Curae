@@ -42,7 +42,9 @@ export const api = {
       http<{ token: string; medecin: any; organisation: any }>('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
     register: (data: any) =>
       http<{ token: string; medecin: any; organisation: any }>('/auth/register', { method: 'POST', body: JSON.stringify(data) }),
-    me: () => http<any>('/auth/me'),
+    me:       () => http<any>('/auth/me'),
+    updateMe: (data: { nom: string; prenoms: string; specialite: string; telephone: string }) =>
+      http<any>('/auth/me', { method: 'PUT', body: JSON.stringify(data) }),
   },
 
   organisation: {
@@ -105,11 +107,20 @@ export const api = {
 
   stats: {
     dashboard: () => http<any>('/stats/dashboard'),
-    exportUrl: (type: string, from?: string, to?: string) => {
+    exportCsv: async (type: string, from?: string, to?: string): Promise<void> => {
       const token = getToken()
       const qs = new URLSearchParams({ type, ...(from ? { from } : {}), ...(to ? { to } : {}) })
-      const BASE = (import.meta as any).env?.VITE_API_URL || 'http://localhost:4000/api'
-      return `${BASE}/stats/export?${qs}&_token=${token}`
+      const url = `${BASE}/stats/export?${qs}`
+      const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } })
+      if (!res.ok) throw new Error('Erreur export CSV')
+      const blob = await res.blob()
+      const a = document.createElement('a')
+      a.href = URL.createObjectURL(blob)
+      a.download = `curae_${type}_${new Date().toISOString().slice(0, 10)}.csv`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(a.href)
     },
   },
 

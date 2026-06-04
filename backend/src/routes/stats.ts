@@ -158,22 +158,30 @@ router.get('/export', async (req: AuthRequest, res: Response) => {
   const { type = 'factures', from, to } = req.query as Record<string, string>
   const mid = req.medecinId
 
+  // Valider le format date (YYYY-MM-DD) avant toute utilisation en SQL
+  const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
+  const safeFrom = from && DATE_RE.test(from) ? from : null
+  const safeTo   = to   && DATE_RE.test(to)   ? to   : null
+
   try {
     let csv = ''
     const sep = ';'
 
     if (type === 'factures') {
+      const params: unknown[] = [mid]
+      let dateFilter = ''
+      if (safeFrom) { params.push(safeFrom); dateFilter += ` AND f.date_emission >= $${params.length}` }
+      if (safeTo)   { params.push(safeTo);   dateFilter += ` AND f.date_emission <= $${params.length}` }
+
       const r = await query(`
         SELECT f.numero, f.date_emission, p.nom, p.prenoms, p.assurance,
                f.montant_total, f.montant_assurance, f.montant_patient,
                f.mode_paiement, f.statut, f.actes
         FROM factures f
         JOIN patients p ON p.id = f.patient_id
-        WHERE f.medecin_id = $1
-          ${from ? `AND f.date_emission >= '${from}'` : ''}
-          ${to ? `AND f.date_emission <= '${to}'` : ''}
+        WHERE f.medecin_id = $1${dateFilter}
         ORDER BY f.date_emission DESC
-      `, [mid])
+      `, params)
 
       csv = `Numéro${sep}Date${sep}Nom${sep}Prénoms${sep}Assureur${sep}Total (FCFA)${sep}Part assurance${sep}Part patient${sep}Mode paiement${sep}Statut${sep}Actes\n`
       csv += r.rows.map(row =>
@@ -204,16 +212,19 @@ router.get('/export', async (req: AuthRequest, res: Response) => {
       ).join('\n')
 
     } else if (type === 'rdv') {
+      const params: unknown[] = [mid]
+      let dateFilter = ''
+      if (safeFrom) { params.push(safeFrom); dateFilter += ` AND r.date >= $${params.length}` }
+      if (safeTo)   { params.push(safeTo);   dateFilter += ` AND r.date <= $${params.length}` }
+
       const r = await query(`
         SELECT r.date, r.heure, p.nom, p.prenoms, r.motif,
                r.type_rdv, r.statut, r.duree_minutes
         FROM rendez_vous r
         JOIN patients p ON p.id = r.patient_id
-        WHERE r.medecin_id = $1
-          ${from ? `AND r.date >= '${from}'` : ''}
-          ${to ? `AND r.date <= '${to}'` : ''}
+        WHERE r.medecin_id = $1${dateFilter}
         ORDER BY r.date DESC, r.heure DESC
-      `, [mid])
+      `, params)
 
       csv = `Date${sep}Heure${sep}Nom${sep}Prénoms${sep}Motif${sep}Type${sep}Statut${sep}Durée (min)\n`
       csv += r.rows.map(row =>

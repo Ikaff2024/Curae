@@ -2,6 +2,7 @@
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
+import rateLimit from 'express-rate-limit'
 import authRoutes          from './routes/auth'
 import patientsRoutes      from './routes/patients'
 import rdvRoutes           from './routes/rdv'
@@ -13,6 +14,7 @@ import abonnementsRoutes   from './routes/abonnements'
 import statsRoutes         from './routes/stats'
 import organisationRoutes  from './routes/organisation'
 import { runMigrations }   from './lib/migrations'
+import pool                from './lib/db'
 
 dotenv.config()
 const app = express()
@@ -31,16 +33,29 @@ app.use(cors({
 }))
 app.use(express.json({ limit: '5mb' }))
 
+// Rate limiting — auth uniquement (login/register)
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Trop de tentatives. Réessayez dans 15 minutes.' },
+})
+
 if (process.env.NODE_ENV === 'development') {
   app.use((req, _res, next) => { console.log(`[${new Date().toISOString().slice(11,19)}] ${req.method} ${req.path}`); next() })
 }
 
-app.get('/health', (_req, res) => res.json({
-  status: 'ok', version: '1.0.0', app: 'Curaé API',
-  routes: ['/auth','/patients','/rdv','/cr','/factures','/whatsapp','/ia','/abonnements'],
-}))
+app.get('/health', async (_req, res) => {
+  try {
+    await pool.query('SELECT 1')
+    res.json({ status: 'ok', version: '1.0.0', app: 'Curaé API', db: 'ok' })
+  } catch {
+    res.status(503).json({ status: 'degraded', version: '1.0.0', app: 'Curaé API', db: 'error' })
+  }
+})
 
-app.use('/api/auth',         authRoutes)
+app.use('/api/auth',         authLimiter, authRoutes)
 app.use('/api/patients',     patientsRoutes)
 app.use('/api/rdv',          rdvRoutes)
 app.use('/api/cr',           crRoutes)

@@ -71,6 +71,23 @@ export async function runMigrations() {
       FROM medecins m WHERE f.medecin_id = m.id AND f.organisation_id IS NULL
     `)
 
+    // ── Migration 006 : table abonnements ───────────────────────────────────
+    await query(`
+      CREATE TABLE IF NOT EXISTS abonnements (
+        id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        medecin_id      UUID NOT NULL REFERENCES medecins(id) ON DELETE CASCADE,
+        plan            VARCHAR(20) NOT NULL DEFAULT 'solo',
+        statut          VARCHAR(20) NOT NULL DEFAULT 'essai',
+        date_debut      TIMESTAMPTZ DEFAULT NOW(),
+        date_fin        TIMESTAMPTZ,
+        wave_ref        VARCHAR(200),
+        wave_session_id VARCHAR(200),
+        montant_paye    INTEGER,
+        created_at      TIMESTAMPTZ DEFAULT NOW(),
+        UNIQUE (medecin_id)
+      )
+    `)
+
     console.log('[Migrations] ✓ Toutes les migrations appliquées')
   } catch (err) {
     console.error('[Migrations] Erreur :', err)

@@ -154,4 +154,26 @@ router.get('/me', authMiddleware, async (req: AuthRequest, res: Response) => {
   }
 })
 
+// PUT /api/auth/me — mise à jour profil médecin
+router.put('/me', authMiddleware, async (req: AuthRequest, res: Response) => {
+  const { nom, prenoms, specialite, telephone } = req.body
+  if (!nom) return res.status(400).json({ error: 'Le nom est requis' })
+
+  try {
+    const result = await query(
+      `UPDATE medecins
+       SET nom=$1, prenoms=$2, specialite=$3, telephone=$4
+       WHERE id=$5
+       RETURNING id, email, nom, prenoms, specialite, telephone, organisation_id, role`,
+      [nom, prenoms || '', specialite || '', telephone || '', req.medecinId]
+    )
+    const row = result.rows[0]
+    if (!row) return res.status(404).json({ error: 'Médecin introuvable' })
+    res.json(row)
+  } catch (err) {
+    console.error('[Auth UpdateMe]', err)
+    res.status(500).json({ error: 'Erreur serveur' })
+  }
+})
+
 export default router

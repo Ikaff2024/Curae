@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import {
-  User, Mail, Phone, MapPin, Briefcase, Shield,
-  Bell, Palette, Save, CheckCircle, Award
+  User, Mail, Phone, MapPin, Briefcase,
+  Bell, Palette, Save, CheckCircle, Loader2,
 } from 'lucide-react'
+import { api } from '../lib/api'
 
 export interface DocteurProfile {
   prenom: string
@@ -68,16 +69,37 @@ function Section({ titre, icon, children }: { titre: string; icon: React.ReactNo
 export default function ParamètresPage({ profile, onSave }: Props) {
   const [form, setForm] = useState<DocteurProfile>(profile)
   const [saved, setSaved] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState('')
 
   function set<K extends keyof DocteurProfile>(key: K, val: string) {
     setForm(prev => ({ ...prev, [key]: val }))
     setSaved(false)
+    setSaveError('')
   }
 
-  function handleSave() {
-    onSave(form)
-    setSaved(true)
-    setTimeout(() => setSaved(false), 3000)
+  async function handleSave() {
+    setSaving(true)
+    setSaveError('')
+    try {
+      await api.auth.updateMe({
+        nom:       form.nom,
+        prenoms:   form.prenom,
+        specialite: form.specialite,
+        telephone: form.telephone,
+      })
+      // Mettre à jour le nom du cabinet si renseigné
+      if (form.cabinet) {
+        await api.organisation.update({ nom: form.cabinet, adresse: form.adresseCabinet }).catch(() => {})
+      }
+      onSave(form)
+      setSaved(true)
+      setTimeout(() => setSaved(false), 3000)
+    } catch (err: any) {
+      setSaveError(err.message || 'Erreur lors de la sauvegarde')
+    } finally {
+      setSaving(false)
+    }
   }
 
   function focusStyle(e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
@@ -98,18 +120,28 @@ export default function ParamètresPage({ profile, onSave }: Props) {
             Configurez votre profil médecin et les préférences du cabinet
           </p>
         </div>
-        <button
-          onClick={handleSave}
-          style={{
-            display: 'flex', alignItems: 'center', gap: 8,
-            background: saved ? '#1a6b3a' : 'var(--accent)', color: '#fff',
-            border: 'none', borderRadius: 9, padding: '11px 22px',
-            fontSize: 14, fontWeight: 700, cursor: 'pointer',
-            transition: 'background 0.2s', fontFamily: 'inherit',
-          }}
-        >
-          {saved ? <><CheckCircle size={15} /> Sauvegardé</> : <><Save size={15} /> Sauvegarder</>}
-        </button>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
+          {saveError && (
+            <div style={{ fontSize: 12, color: '#dc2626', maxWidth: 240, textAlign: 'right' }}>{saveError}</div>
+          )}
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 8,
+              background: saved ? '#1a6b3a' : 'var(--accent)', color: '#fff',
+              border: 'none', borderRadius: 9, padding: '11px 22px',
+              fontSize: 14, fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer',
+              transition: 'background 0.2s', fontFamily: 'inherit', opacity: saving ? 0.7 : 1,
+            }}
+          >
+            {saving
+              ? <><Loader2 size={15} style={{ animation: 'spin 1s linear infinite' }} /> Sauvegarde…</>
+              : saved
+                ? <><CheckCircle size={15} /> Sauvegardé</>
+                : <><Save size={15} /> Sauvegarder</>}
+          </button>
+        </div>
       </div>
 
       {/* Profil médecin */}

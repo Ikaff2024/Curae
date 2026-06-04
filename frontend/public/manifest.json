@@ -1,0 +1,21 @@
+{
+  "name": "Curaé — Cabinet médical",
+  "short_name": "Curaé",
+  "description": "Logiciel de gestion de cabinet médical — Côte d'Ivoire",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f7f8f6",
+  "theme_color": "#0f6e56",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["medical", "productivity", "business"],
+  "lang": "fr",
+  "dir": "ltr"
+}

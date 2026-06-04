@@ -3,13 +3,7 @@ import { BarChart2, TrendingUp, Clock, CheckCircle, AlertCircle, ChevronRight, D
 import { api } from '../lib/api'
 
 function exporterCSV() {
-  const url = api.stats.exportUrl('factures')
-  const a = document.createElement('a')
-  a.href = url
-  a.download = `curae_factures_${new Date().toISOString().slice(0, 10)}.csv`
-  document.body.appendChild(a)
-  a.click()
-  document.body.removeChild(a)
+  api.stats.exportCsv('factures').catch(err => console.error('[Export CSV]', err))
 }
 
 interface Facture {
