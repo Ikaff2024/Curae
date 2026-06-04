@@ -228,6 +228,22 @@ export default function App() {
           >
             <Settings size={18} /> <span style={{ flex: 1 }}>Paramètres</span>
           </button>
+          <a
+            href="/guide.html"
+            target="_blank"
+            rel="noopener"
+            style={{
+              width: '100%', display: 'flex', alignItems: 'center',
+              gap: 10, padding: '10px 12px', borderRadius: 10,
+              fontSize: 14, background: 'transparent',
+              color: 'var(--muted)', textAlign: 'left', fontFamily: 'inherit',
+              textDecoration: 'none',
+            }}
+            onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.background = 'var(--bg)'}
+            onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.background = 'transparent'}
+          >
+            <Heart size={18} /> <span style={{ flex: 1 }}>Guide d'utilisation</span>
+          </a>
           <button
             onClick={logout}
             style={{

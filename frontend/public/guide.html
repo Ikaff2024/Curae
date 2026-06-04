@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aide / Guide d'utilisation — Curaé</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --accent:       #0f6e56;
+      --accent-light: #e8f4f0;
+      --accent-mid:   #0d5f4a;
+      --bg:           #f7f8f6;
+      --surface:      #ffffff;
+      --border:       #e8e8e4;
+      --text:         #1a1a18;
+      --muted:        #6b7280;
+      --sidebar-w:    264px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 15px;
+      line-height: 1.65;
+    }
+
+    /* ── Topbar ─────────────────────────────────────────────── */
+    .topbar {
+      position: fixed; top: 0; left: 0; right: 0; height: 56px;
+      background: var(--accent);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 28px 0 0;
+      z-index: 100;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    }
+    .topbar-brand {
+      display: flex; align-items: center; gap: 12px;
+      width: var(--sidebar-w); padding: 0 20px;
+      border-right: 1px solid rgba(255,255,255,0.15);
+    }
+    .topbar-logo {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: rgba(255,255,255,0.2);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .topbar-logo svg { fill: white; }
+    .topbar-name { font-weight: 800; font-size: 17px; color: #fff; letter-spacing: -0.02em; }
+    .topbar-sub  { font-size: 11px; color: rgba(255,255,255,0.65); margin-top: -1px; }
+    .topbar-title {
+      flex: 1; padding-left: 28px;
+      color: #fff; font-weight: 700; font-size: 15px;
+    }
+    .topbar-title span { opacity: 0.65; font-weight: 400; }
+    .btn-print {
+      display: flex; align-items: center; gap: 7px;
+      padding: 8px 16px; border-radius: 8px;
+      border: 1.5px solid rgba(255,255,255,0.35);
+      background: transparent; color: #fff;
+      font-family: inherit; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: background 0.15s;
+    }
+    .btn-print:hover { background: rgba(255,255,255,0.15); }
+    .btn-print svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* ── Layout ─────────────────────────────────────────────── */
+    .layout {
+      display: flex;
+      margin-top: 56px;
+      min-height: calc(100vh - 56px);
+    }
+
+    /* ── Sidebar ────────────────────────────────────────────── */
+    .sidebar {
+      width: var(--sidebar-w); flex-shrink: 0;
+      position: fixed; top: 56px; bottom: 0; left: 0;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      padding: 20px 0 32px;
+    }
+    .sidebar::-webkit-scrollbar { width: 4px; }
+    .sidebar::-webkit-scrollbar-thumb { background: #d0d0cc; border-radius: 2px; }
+
+    .sidebar-section-title {
+      padding: 4px 20px 8px;
+      font-size: 10px; font-weight: 800;
+      color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em;
+      margin-top: 12px;
+    }
+    .nav-link {
+      display: block;
+      padding: 7px 20px;
+      font-size: 13px; font-weight: 500; color: var(--muted);
+      text-decoration: none;
+      border-left: 3px solid transparent;
+      transition: all 0.12s;
+      line-height: 1.3;
+    }
+    .nav-link:hover { color: var(--accent); background: var(--accent-light); }
+    .nav-link.active {
+      color: var(--accent); font-weight: 700;
+      background: var(--accent-light);
+      border-left-color: var(--accent);
+    }
+    .nav-sub {
+      padding: 5px 20px 5px 32px;
+      font-size: 12px; color: var(--muted);
+      text-decoration: none; display: block;
+      transition: color 0.12s;
+    }
+    .nav-sub:hover { color: var(--accent); }
+    .nav-badge {
+      float: right; font-size: 10px; font-weight: 700;
+      background: var(--accent-light); color: var(--accent);
+      padding: 1px 7px; border-radius: 10px; margin-top: 1px;
+    }
+    .sidebar-divider {
+      height: 1px; background: var(--border);
+      margin: 12px 20px;
+    }
+
+    /* ── Content ────────────────────────────────────────────── */
+    .content {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      padding: 40px 60px 80px;
+      max-width: calc(100% - var(--sidebar-w));
+    }
+
+    /* ── Sections ───────────────────────────────────────────── */
+    .section { margin-bottom: 72px; scroll-margin-top: 80px; }
+    .section-header {
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 28px; padding-bottom: 16px;
+      border-bottom: 2px solid var(--border);
+    }
+    .section-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: var(--accent-light);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--accent); font-size: 20px; flex-shrink: 0;
+    }
+    .section-num {
+      font-size: 11px; font-weight: 800; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.06em;
+    }
+    .section-title {
+      font-size: 22px; font-weight: 800; color: var(--text);
+      letter-spacing: -0.02em; line-height: 1.2;
+    }
+
+    /* Sub-sections */
+    .sub { margin-bottom: 36px; scroll-margin-top: 80px; }
+    .sub-title {
+      font-size: 17px; font-weight: 800; color: var(--accent);
+      margin-bottom: 16px; padding-left: 12px;
+      border-left: 3px solid var(--accent);
+    }
+
+    /* Cards layout */
+    .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px 16px;
+    }
+    .card-title { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px; }
+    .card-body { font-size: 13px; color: var(--text); }
+
+    /* Blocks */
+    .block-title {
+      font-size: 14px; font-weight: 800; color: var(--text);
+      margin: 20px 0 8px; display: flex; align-items: center; gap: 7px;
+    }
+    .block-title::before { content: ''; display: inline-block; width: 4px; height: 16px; background: var(--accent); border-radius: 2px; }
+
+    p { margin-bottom: 12px; color: #333; }
+    p:last-child { margin-bottom: 0; }
+
+    /* Steps */
+    .steps { list-style: none; counter-reset: steps; margin: 0 0 16px; }
+    .steps li {
+      counter-increment: steps;
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+    .steps li:last-child { border-bottom: none; }
+    .steps li::before {
+      content: counter(steps);
+      min-width: 26px; height: 26px; border-radius: 50%;
+      background: var(--accent); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 800; flex-shrink: 0; margin-top: 1px;
+    }
+    .steps li strong { color: var(--accent); }
+
+    /* Bullets */
+    .bullets { list-style: none; margin: 0 0 16px; }
+    .bullets li {
+      padding: 6px 0 6px 20px; position: relative;
+      font-size: 14px; border-bottom: 1px solid #f0f0ee;
+    }
+    .bullets li:last-child { border-bottom: none; }
+    .bullets li::before {
+      content: '→';
+      position: absolute; left: 0;
+      color: var(--accent); font-weight: 800;
+    }
+
+    /* Callout boxes */
+    .callout {
+      border-radius: 10px; padding: 14px 16px;
+      margin: 14px 0; font-size: 13px; line-height: 1.6;
+      display: flex; align-items: flex-start; gap: 10px;
+    }
+    .callout-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+    .callout.tip   { background: #f0f7f5; border: 1px solid #b0ddd0; color: #0d4f3a; }
+    .callout.warn  { background: #fef9e7; border: 1px solid #f0d070; color: #7a4f00; }
+    .callout.info  { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+    .callout.ai    { background: #faf5ff; border: 1px solid #d8b4fe; color: #5b21b6; }
+    .callout.danger{ background: #fef2f2; border: 1px solid #fca5a5; color: #991b1b; }
+
+    /* Table */
+    table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; font-size: 13px; }
+    th { background: var(--accent); color: #fff; font-weight: 700; padding: 10px 14px; text-align: left; }
+    td { padding: 9px 14px; border-bottom: 1px solid var(--border); }
+    tr:hover td { background: var(--accent-light); }
+    tr:last-child td { border-bottom: none; }
+    table { border-radius: 10px; overflow: hidden; border: 1px solid var(--border); }
+
+    /* Code / shortcut */
+    kbd {
+      background: #f0f0ee; border: 1px solid #d0d0cc;
+      border-radius: 4px; padding: 1px 7px;
+      font-family: monospace; font-size: 12px; color: #333;
+    }
+    .tag {
+      display: inline-block; padding: 2px 9px;
+      border-radius: 12px; font-size: 11px; font-weight: 700;
+    }
+    .tag.green  { background: #dcfce7; color: #15803d; }
+    .tag.orange { background: #fef3c7; color: #b45309; }
+    .tag.red    { background: #fee2e2; color: #dc2626; }
+    .tag.blue   { background: #dbeafe; color: #1d4ed8; }
+    .tag.purple { background: #ede9fe; color: #7c3aed; }
+
+    /* Hero intro */
+    .hero {
+      background: linear-gradient(135deg, var(--accent) 0%, #0d5f4a 100%);
+      border-radius: 16px; padding: 32px 36px; margin-bottom: 48px; color: #fff;
+    }
+    .hero h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 8px; }
+    .hero p { color: rgba(255,255,255,0.8); font-size: 15px; margin-bottom: 20px; }
+    .hero-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+    .hero-pill {
+      background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 20px; padding: 5px 14px;
+      font-size: 12px; font-weight: 700; color: #fff;
+      display: flex; align-items: center; gap: 5px;
+    }
+
+    /* Section divider */
+    .divider {
+      text-align: center; padding: 12px 0; margin: 32px 0;
+      color: var(--muted); font-size: 12px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* Print */
+    @media print {
+      .topbar, .sidebar, .btn-print { display: none !important; }
+      .content { margin-left: 0; padding: 20px; max-width: 100%; }
+      .section { break-inside: avoid; }
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .sidebar { display: none; }
+      .content { margin-left: 0; padding: 20px; max-width: 100%; }
+      .cards { grid-template-columns: 1fr; }
+      .topbar-brand { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Topbar ───────────────────────────────────────────────────── -->
+<header class="topbar">
+  <div class="topbar-brand">
+    <div class="topbar-logo">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18">
+        <path d="M12 21C7 17 3 13.5 3 9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 4.5-4 8-9 12z"/>
+      </svg>
+    </div>
+    <div>
+      <div class="topbar-name">Curaé</div>
+      <div class="topbar-sub">Cabinet médical · Côte d'Ivoire</div>
+    </div>
+  </div>
+  <div class="topbar-title">Aide / Guide d'utilisation <span>— Mode d'emploi détaillé, module par module</span></div>
+  <button class="btn-print" onclick="window.print()">
+    <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+    Imprimer cette fiche
+  </button>
+</header>
+
+<!-- ── Layout ───────────────────────────────────────────────────── -->
+<div class="layout">
+
+  <!-- Sidebar -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-section-title">Sommaire</div>
+
+    <a href="#demarrage" class="nav-link active">1. Démarrage</a>
+    <a href="#demarrage-inscription" class="nav-sub">↳ Inscription cabinet</a>
+    <a href="#demarrage-connexion" class="nav-sub">↳ Connexion</a>
+
+    <a href="#patients" class="nav-link">2. Patients & Dossiers</a>
+    <a href="#patients-creer" class="nav-sub">↳ Créer un patient</a>
+    <a href="#patients-fiche" class="nav-sub">↳ Fiche détaillée</a>
+    <a href="#patients-vitaux" class="nav-sub">↳ Vitaux & historique</a>
+    <a href="#patients-risque" class="nav-sub">↳ Score de risque</a>
+
+    <a href="#agenda" class="nav-link">3. Agenda & Rendez-vous</a>
+    <a href="#agenda-rdv" class="nav-sub">↳ Créer un RDV</a>
+    <a href="#agenda-statuts" class="nav-sub">↳ Statuts RDV</a>
+    <a href="#agenda-whatsapp" class="nav-sub">↳ Confirmation WhatsApp</a>
+
+    <a href="#cr" class="nav-link">4. Comptes-rendus</a>
+    <a href="#cr-types" class="nav-sub">↳ Types de CR</a>
+    <a href="#cr-creer" class="nav-sub">↳ Créer un CR</a>
+    <a href="#cr-pdf" class="nav-sub">↳ Export PDF</a>
+
+    <a href="#ia" class="nav-link">5. Dictée vocale & IA <span class="nav-badge">IA</span></a>
+    <a href="#ia-dictee" class="nav-sub">↳ Utiliser la dictée</a>
+    <a href="#ia-resume" class="nav-sub">↳ Résumé clinique IA</a>
+
+    <a href="#consultation" class="nav-link">6. Mode Consultation</a>
+
+    <a href="#facturation" class="nav-link">7. Facturation</a>
+    <a href="#facturation-creer" class="nav-sub">↳ Créer une facture</a>
+    <a href="#facturation-assureurs" class="nav-sub">↳ Assureurs NSIA…</a>
+    <a href="#facturation-export" class="nav-sub">↳ Export CSV</a>
+
+    <a href="#whatsapp" class="nav-link">8. WhatsApp</a>
+
+    <a href="#parametres" class="nav-link">9. Paramètres</a>
+
+    <a href="#abonnement" class="nav-link">10. Abonnement</a>
+
+    <a href="#offline" class="nav-link">11. Mode hors ligne</a>
+
+    <a href="#faq" class="nav-link">12. FAQ & Problèmes</a>
+
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section-title">Accès rapide</div>
+    <a href="/" class="nav-link" style="color: var(--accent); font-weight:700;">← Retour à l'app</a>
+  </nav>
+
+  <!-- Content -->
+  <main class="content">
+
+    <!-- Hero -->
+    <div class="hero">
+      <h1>Guide d'utilisation Curaé</h1>
+      <p>Mode d'emploi complet pour gérer votre cabinet médical. Chaque module est détaillé pas à pas — du premier patient à la facture finale.</p>
+      <div class="hero-pills">
+        <div class="hero-pill">🫀 Cabinet médical</div>
+        <div class="hero-pill">🇨🇮 Côte d'Ivoire</div>
+        <div class="hero-pill">💳 FCFA · NSIA · Allianz · AXA</div>
+        <div class="hero-pill">🤖 IA Claude (Anthropic)</div>
+        <div class="hero-pill">📱 Web + Mobile</div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 1. DÉMARRAGE -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section class="section" id="demarrage">
+      <div class="section-header">
+        <div class="section-icon">🚀</div>
+        <div>
+          <div class="section-num">Section 1</div>
+          <div class="section-title">Démarrage</div>
+        </div>
+      </div>
+
+      <div class="sub" id="demarrage-inscription">
+        <div class="sub-title">1.A — Créer votre cabinet (inscription)</div>
+
+        <div class="cards">
+          <div class="card">
+            <div class="card-title">À quoi ça sert</div>
+            <div class="card-body">Créer le compte principal de votre structure médicale. Tous vos médecins, patients et données y seront rattachés.</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Qui peut le faire</div>
+            <div class="card-body">N'importe qui — l'inscription crée automatiquement un compte <strong>Administrateur médecin</strong>.</div>
+          </div>
+        </div>
+
+        <div class="block-title">Pas à pas</div>
+        <ol class="steps">
+          <li>Sur la page d'accueil, cliquez sur l'onglet <strong>Inscription</strong>.</li>
+          <li><strong>Étape 1 — Votre cabinet :</strong> saisissez le nom de la structure (ex : <em>"Cabinet Cardio Cocody"</em>), le type (cabinet / clinique / hôpital / centre de santé), la ville et l'e-mail du cabinet.</li>
+          <li>Cliquez <strong>Étape suivante</strong>. Un récapitulatif de l'étape 1 s'affiche en haut pour vérification.</li>
+          <li><strong>Étape 2 — Compte administrateur :</strong> renseignez votre nom, prénoms, spécialité, adresse e-mail professionnelle et un mot de passe (6 caractères minimum).</li>
+          <li>Cliquez <strong>Créer mon compte</strong>. Vous êtes redirigé directement vers le tableau de bord.</li>
+        </ol>
+
+        <div class="callout tip"><span class="callout-icon">💡</span> <div>Le compte créé lors de l'inscription a le rôle <strong>Admin médecin</strong> — il peut modifier les paramètres du cabinet et inviter d'autres médecins.</div></div>
+        <div class="callout warn"><span class="callout-icon">⚠️</span> <div>Chaque adresse e-mail ne peut être utilisée qu'une seule fois. Si vous voyez "Email déjà utilisé", connectez-vous plutôt que de recréer un compte.</div></div>
+      </div>
+
+      <div class="sub" id="demarrage-connexion">
+        <div class="sub-title">1.B — Se connecter</div>
+        <ol class="steps">
+          <li>Entrez votre <strong>adresse e-mail</strong> et votre <strong>mot de passe</strong>.</li>
+          <li>Cliquez <strong>Se connecter</strong>. La session dure 7 jours.</li>
+          <li>Pour se déconnecter, cliquez sur <strong>Déconnexion</strong> en bas de la barre latérale.</li>
+        </ol>
+        <div class="callout info"><span class="callout-icon">ℹ️</span> <div>Si votre session expire ("Session expirée"), il suffit de vous reconnecter avec vos identifiants habituels — vos données sont conservées.</div></div>
+        <div class="callout tip"><span class="callout-icon">📱</span> <div>Sur mobile, la barre latérale est accessible via le bouton <kbd>☰</kbd> en haut à gauche. La barre de navigation en bas donne accès aux 5 pages principales.</div></div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 2. PATIENTS -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section class="section" id="patients">
+      <div class="section-header">
+        <div class="section-icon">👥</div>
+        <div>
+          <div class="section-num">Section 2</div>
+          <div class="section-title">Patients &amp; Dossiers médicaux</div>
+        </div>
+      </div>
+
+      <div class="sub" id="patients-creer">
+        <div class="sub-title">2.A — Créer un dossier patient</div>
+
+        <div class="cards">
+          <div class="card">
+            <div class="card-title">À quoi ça sert</div>
+            <div class="card-body">Centraliser toutes les informations médicales d'un patient : identité, antécédents, vitaux, rendez-vous, comptes-rendus et factures.</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Champs obligatoires</div>
+            <div class="card-body"><strong>Nom</strong>, <strong>Prénoms</strong>, <strong>Date de naissance</strong>, <strong>Téléphone</strong>. Le reste est optionnel.</div>
+          </div>
+        </div>
+
+        <div class="block-title">Pas à pas</div>
+        <ol class="steps">
+          <li>Dans la barre latérale, cliquez sur <strong>Patients</strong>.</li>
+          <li>Cliquez sur le bouton vert <strong>+ Nouveau patient</strong> en haut à droite.</li>
+          <li>Remplissez le formulaire : identité (nom, prénoms, date de naissance, sexe), contact (téléphone, e-mail, adresse), assurance (NSIA, Allianz, AXA, Sanlam ou Aucun) et informations complémentaires (profession, antécédents médicaux).</li>
+          <li>Cliquez <strong>Enregistrer</strong>. Un numéro de dossier est généré automatiquement (ex : <kbd>PAT-2025-0042</kbd>).</li>
+        </ol>
+
+        <div class="callout tip"><span class="callout-icon">💡</span> <div>Renseignez les <strong>antécédents médicaux</strong> dès la création du dossier — Curaé les analyse automatiquement pour détecter les facteurs de risque (anticoagulants, HTA, diabète).</div></div>
+
+        <div class="block-title">Rechercher un patient</div>
+        <p>La barre de recherche en haut de la liste filtre en temps réel sur le <strong>nom</strong>, les <strong>prénoms</strong>, le <strong>numéro de dossier</strong> et le <strong>téléphone</strong>. Tapez au moins 2 caractères.</p>
+      </div>
+
+      <div class="sub" id="patients-fiche">
+        <div class="sub-title">2.B — Fiche détaillée (3 onglets)</div>
+        <p>Cliquez sur un patient dans la liste pour ouvrir sa fiche. Elle contient 3 onglets :</p>
+
+        <table>
+          <thead><tr><th>Onglet</th><th>Contenu</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Résumé</strong></td><td>Identité, coordonnées, assureur, antécédents, score de risque, boutons d'action (Consultation, Ordonnance, Résumé IA, WhatsApp)</td></tr>
+            <tr><td><strong>Vitaux</strong></td><td>Graphiques sparkline des 6 derniers CRs : pression artérielle, fréquence cardiaque, SpO₂, HbA1c. Alertes automatiques si valeurs anormales.</td></tr>
+            <tr><td><strong>Historique</strong></td><td>Timeline chronologique : consultations, RDV, factures, ordonnances. Filtre par type d'événement.</td></tr>
+          </tbody>
+        </table>
+
+        <div class="block-title">Actions disponibles depuis la fiche</div>
+        <ul class="bullets">
+          <li><strong>Démarrer une consultation</strong> — ouvre le mode consultation plein écran</li>
+          <li><strong>Résumé IA</strong> — génère un résumé clinique complet basé sur les derniers CRs (nécessite la clé Anthropic)</li>
+          <li><strong>Ordonnance</strong> — crée et télécharge une ordonnance PDF au format officiel</li>
+          <li><strong>WhatsApp</strong> — envoie un message de confirmation ou de rappel</li>
+          <li><strong>Modifier</strong> — met à jour les informations du patient</li>
+          <li><strong>Supprimer</strong> — supprime définitivement le dossier (confirmation requise)</li>
+        </ul>
+      </div>
+
+      <div class="sub" id="patients-vitaux">
+        <div class="sub-title">2.C — Suivi des vitaux</div>
+        <p>L'onglet <strong>Vitaux</strong> affiche automatiquement les valeurs extraites des 6 derniers comptes-rendus :</p>
+        <table>
+          <thead><tr><th>Indicateur</th><th>Seuil d'alerte</th><th>Source</th></tr></thead>
+          <tbody>
+            <tr><td>Pression artérielle (PA)</td><td>≥ 160/100 mmHg → ⚠️ Alerte</td><td>Champs PA droite/gauche du CR</td></tr>
+            <tr><td>Fréquence cardiaque (FC)</td><td>— (affiché uniquement)</td><td>Champ FC du CR</td></tr>
+            <tr><td>SpO₂</td><td>≤ 92% → ⚠️ Alerte</td><td>Champ SpO₂ du CR</td></tr>
+            <tr><td>HbA1c</td><td>≥ 8% → ⚠️ Alerte</td><td>Données spécialisées (diabétologie)</td></tr>
+          </tbody>
+        </table>
+        <div class="callout info"><span class="callout-icon">ℹ️</span> <div>Les graphiques sont mis à jour automatiquement à chaque nouveau compte-rendu enregistré pour ce patient.</div></div>
+      </div>
+
+      <div class="sub" id="patients-risque">
+        <div class="sub-title">2.D — Score de risque automatique</div>
+        <p>Curaé attribue automatiquement un niveau de risque à chaque patient en analysant ses antécédents et ses derniers CRs :</p>
+        <table>
+          <thead><tr><th>Niveau</th><th>Critères déclencheurs</th><th>Affichage</th></tr></thead>
+          <tbody>
+            <tr><td><span class="tag red">Risque élevé</span></td><td>Anticoagulants (Xarelto, Warfarine, Eliquis…), HTA sévère (PA ≥ 160/100), HbA1c ≥ 8%</td><td>Badge rouge sur la fiche et dans le tableau de bord</td></tr>
+            <tr><td><span class="tag orange">Risque modéré</span></td><td>HTA, Diabète, Insuffisance cardiaque, Fibrillation auriculaire</td><td>Badge orange</td></tr>
+            <tr><td><span class="tag green">Stable</span></td><td>Aucun facteur détecté</td><td>Aucun badge</td></tr>
+          </tbody>
+        </table>
+        <div class="callout tip"><span class="callout-icon">💡</span> <div>Le tableau de bord affiche la liste des <strong>patients à risque élevé</strong> détectés dans les 90 derniers jours. Consultez-le chaque matin pour prioriser votre journée.</div></div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 3. AGENDA -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section class="section" id="agenda">
+      <div class="section-header">
+        <div class="section-icon">📅</div>
+        <div>
+          <div class="section-num">Section 3</div>
+          <div class="section-title">Agenda &amp; Rendez-vous</div>
+        </div>
+      </div>
+
+      <div class="sub" id="agenda-rdv">
+        <div class="sub-title">3.A — Planifier un rendez-vous</div>
+        <div class="cards">
+          <div class="card">
+            <div class="card-title">À quoi ça sert</div>
+            <div class="card-body">Gérer le planning hebdomadaire du cabinet, visualiser les RDV du jour, envoyer des confirmations automatiques.</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Navigation calendrier</div>
+            <div class="card-body">Cliquez sur les flèches <kbd>←</kbd> <kbd>→</kbd> pour changer de semaine. Cliquez sur <strong>Aujourd'hui</strong> pour revenir à la semaine en cours.</div>
+          </div>
+        </div>
+
+        <div class="block-title">Pas à pas</div>
+        <ol class="steps">
+          <li>Dans l'Agenda, cliquez sur le <strong>jour souhaité</strong> dans le calendrier hebdomadaire.</li>
+          <li>Cliquez sur le bouton vert <strong>+ Ajouter un RDV</strong> dans le panneau de droite.</li>
+          <li>Dans la modal, sélectionnez le <strong>patient</strong> dans la liste déroulante (les patients existants apparaissent — créez-en un d'abord si nécessaire).</li>
+          <li>Renseignez l'<strong>heure</strong> et la <strong>durée</strong> (15 / 20 / 30 / 45 / 60 / 90 min).</li>
+          <li>Ajoutez un <strong>motif</strong> de consultation (optionnel mais recommandé).</li>
+          <li>Cliquez <strong>+ Enregistrer le RDV</strong>. Il apparaît immédiatement dans la liste du jour sélectionné.</li>
+        </ol>
+
+        <div class="callout tip"><span class="callout-icon">💡</span> <div>Pour modifier un RDV existant, cliquez dessus dans la liste pour l'ouvrir, puis modifiez les champs. Pour marquer un RDV comme <strong>Honoré</strong>, changez son statut via le bouton de statut.</div></div>
+      </div>
+
+      <div class="sub" id="agenda-statuts">
+        <div class="sub-title">3.B — Statuts des rendez-vous</div>
+        <table>
+          <thead><tr><th>Statut</th><th>Signification</th><th>Action recommandée</th></tr></thead>
+          <tbody>
+            <tr><td><span class="tag blue">En attente</span></td><td>RDV créé, patient non encore confirmé</td><td>Envoyer une confirmation WhatsApp</td></tr>
+            <tr><td><span class="tag green">Confirmé</span></td><td>Patient a confirmé sa présence</td><td>Envoyer un rappel 24h avant</td></tr>
+            <tr><td><span class="tag green">Honoré</span></td><td>Patient est venu à la consultation</td><td>Créer le compte-rendu associé</td></tr>
+            <tr><td><span class="tag orange">Annulé</span></td><td>RDV annulé (patient ou cabinet)</td><td>Proposer un autre créneau</td></tr>
+            <tr><td><span class="tag red">No-show</span></td><td>Patient ne s'est pas présenté</td><td>Comptabilisé dans le taux de présence</td></tr>
+          </tbody>
+        </table>
+        <div class="callout warn"><span class="callout-icon">⚠️</span> <div>Le <strong>taux de présence</strong> affiché sur le tableau de bord est calculé sur les 30 derniers jours. Marquez systématiquement les RDV "No-show" pour avoir des statistiques fiables.</div></div>
+      </div>
+
+      <div class="sub" id="agenda-whatsapp">
+        <div class="sub-title">3.C — Confirmation WhatsApp depuis l'Agenda</div>
+        <ol class="steps">
+          <li>Dans la liste des RDV du jour, cliquez sur l'icône <strong>WhatsApp verte</strong> à droite du RDV concerné.</li>
+          <li>Choisissez le type de message : <strong>Confirmation</strong>, <strong>Rappel</strong> ou <strong>Annulation</strong>.</li>
+          <li>Un aperçu du message s'affiche — vous pouvez le personnaliser avant envoi.</li>
+          <li>Cliquez <strong>Envoyer via WhatsApp</strong>. Le message part au numéro du patient.</li>
+        </ol>
+        <div class="callout info"><span class="callout-icon">ℹ️</span> <div>La fonctionnalité WhatsApp nécessite une clé API WhatsApp Business (Meta for Developers) configurée dans les variables d'environnement du serveur. Sans cette clé, l'aperçu fonctionne mais l'envoi est simulé.</div></div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 4. COMPTES-RENDUS -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section class="section" id="cr">
+      <div class="section-header">
+        <div class="section-icon">📄</div>
+        <div>
+          <div class="section-num">Section 4</div>
+          <div class="section-title">Comptes-rendus médicaux</div>
+        </div>
+      </div>
+
+      <div class="sub" id="cr-types">
+        <div class="sub-title">4.A — Types de comptes-rendus disponibles</div>
+        <table>
+          <thead><tr><th>Type</th><th>Spécialité</th><th>Champs spécifiques</th></tr></thead>
+          <tbody>
+            <tr><td><span class="tag green">Consultation</span></td><td>Tous</td><td>Anamnèse, examen clinique, diagnostic, traitement, PA, FC, SpO₂</td></tr>
+            <tr><td><span class="tag blue">ECG</span></td><td>Cardiologie</td><td>Rythme, fréquence, axe, onde P, QRS, QT, interprétation</td></tr>
+            <tr><td><span class="tag blue">ETT</span></td><td>Cardiologie</td><td>FEVG, cavités, valves, péricarde, conclusion</td></tr>
+            <tr><td><span class="tag blue">Holter</span></td><td>Cardiologie</td><td>Durée enregistrement, arythmies, FC min/max/moy, événements</td></tr>
+            <tr><td><span class="tag blue">MAPA</span></td><td>Cardiologie</td><td>PA jour/nuit, dipping, charge tensionnelle, profil</td></tr>
+            <tr><td><span class="tag purple">Gynécologie</span></td><td>Gynécologie</td><td>Terme, hauteur utérine, mouvements fœtaux, col, annexes</td></tr>
+            <tr><td><span class="tag orange">Pédiatrie</span></td><td>Pédiatrie</td><td>Poids, taille, PC, courbes de croissance, vaccination</td></tr>
+            <tr><td><span class="tag orange">Diabétologie</span></td><td>Diabétologie</td><td>Glycémie à jeun, HbA1c, bilan rénal, pieds, traitement ADO/insuline</td></tr>
+            <tr><td><span class="tag green">Autre spécialité</span></td><td>Tous</td><td>Champs libres</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="sub" id="cr-creer">
+        <div class="sub-title">4.B — Créer un compte-rendu manuellement</div>
+        <ol class="steps">
+          <li>Allez dans <strong>Comptes-rendus</strong> et cliquez sur <strong>+ Nouveau CR</strong>.</li>
+          <li>Sélectionnez le <strong>patient</strong> dans la liste déroulante.</li>
+          <li>Choisissez le <strong>type de CR</strong> — les champs spécialisés s'affichent automatiquement selon le type choisi.</li>
+          <li>Remplissez les champs cliniques (motif, anamnèse, examen, diagnostic, traitement, prescription).</li>
+          <li>Cliquez <strong>Générer avec l'IA</strong> pour enrichir automatiquement le contenu, ou saisissez directement.</li>
+          <li>Choisissez le statut : <span class="tag orange">Brouillon</span> (à compléter) ou <span class="tag green">Finalisé</span> (prêt à signer).</li>
+          <li>Cliquez <strong>Enregistrer</strong>.</li>
+        </ol>
+
+        <div class="callout tip"><span class="callout-icon">💡</span> <div>Utilisez les <strong>brouillons</strong> pour les CRs en cours de rédaction. Seuls les CRs "Finalisés" peuvent être exportés en PDF officiel et envoyés au patient.</div></div>
+      </div>
+
+      <div class="sub" id="cr-pdf">
+        <div class="sub-title">4.C — Export PDF sécurisé</div>
+        <p>Cliquez sur le bouton <strong>PDF</strong> à droite d'un CR dans la liste. Le PDF généré inclut :</p>
+        <ul class="bullets">
+          <li>En-tête avec nom du médecin, spécialité, cabinet, date et numéro de référence</li>
+          <li>Informations patient complètes</li>
+          <li>Contenu clinique structuré</li>
+          <li>Zone de signature électronique avec empreinte numérique (hash SHA)</li>
+          <li>QR code de vérification d'authenticité</li>
+          <li>Pied de page avec référence unique (ex : <kbd>CR-2025-A1B2</kbd>)</li>
+        </ul>
+        <div class="callout info"><span class="callout-icon">ℹ️</span> <div>Le QR code et le hash garantissent l'intégrité du document. Ils permettent de détecter toute modification ultérieure du PDF.</div></div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 5. IA & DICTÉE -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section class="section" id="ia">
+      <div class="section-header">
+        <div class="section-icon">🤖</div>
+        <div>
+          <div class="section-num">Section 5</div>
+          <div class="section-title">Dictée vocale &amp; Intelligence artificielle</div>
+        </div>
+      </div>
+
+      <div class="callout ai"><span class="callout-icon">✨</span> <div><strong>L'IA Curaé assiste la rédaction — le médecin garde toujours la validation finale.</strong> Aucun texte n'est envoyé au patient sans votre relecture et validation explicite.</div></div>
+
+      <div class="sub" id="ia-dictee">
+        <div class="sub-title">5.A — Dictée vocale (5 étapes)</div>
+        <div class="cards">
+          <div class="card">
+            <div class="card-title">Prérequis</div>
+            <div class="card-body">Navigateur Chrome ou Edge (support Web Speech API). Microphone autorisé. Connexion internet active.</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Langue reconnue</div>
+            <div class="card-body">Français ivoirien (fr-CI). Reconnaît les termes médicaux : noms de médicaments, diagnostics, examens biologiques.</div>
+          </div>
+        </div>
+
+        <ol class="steps">
+          <li><strong>Sélection patient :</strong> choisissez le patient dans la liste déroulante de la modal Dictée vocale.</li>
+          <li><strong>Enregistrement :</strong> cliquez sur le bouton microphone et parlez naturellement. Décrivez les symptômes, l'examen clinique et votre diagnostic comme vous le feriez à un confrère. Cliquez à nouveau pour arrêter.</li>
+          <li><strong>Correction :</strong> relisez la transcription brute. Corrigez les erreurs de reconnaissance si nécessaire. Les zones sensibles (médicaments, posologies, allergies, diagnostics) sont <mark style="background:#fef3c7;">surlignées en jaune</mark> pour attirer votre attention.</li>
+          <li><strong>Structuration IA :</strong> cliquez <strong>Structurer avec l'IA</strong>. Claude (Anthropic) organise la transcription en sections médicales standardisées (motif, anamnèse, examen, diagnostic, traitement, prescription).</li>
+          <li><strong>Validation :</strong> relisez le CR structuré, apportez les modifications finales, puis cliquez <strong>Enregistrer et finaliser</strong>.</li>
+        </ol>
+
+        <div class="callout warn"><span class="callout-icon">⚠️</span> <div>Parlez clairement et à un rythme modéré. Articulez les noms de médicaments lettre par lettre si nécessaire. La dictée fonctionne mieux dans un environnement silencieux.</div></div>
+        <div class="callout tip"><span class="callout-icon">💡</span> <div><strong>Astuce réfractaires :</strong> vous pouvez commencer par dicter seulement 2-3 phrases (motif + diagnostic) et laisser l'IA compléter le reste. Vous corrigez en 30 secondes. C'est plus rapide que taper.</div></div>
+      </div>
+
+      <div class="sub" id="ia-resume">
+        <div class="sub-title">5.B — Résumé clinique IA d'un patient</div>
+        <p>Depuis la <strong>fiche patient</strong>, cliquez sur le bouton <strong>Résumé IA</strong>. L'IA analyse l'ensemble des comptes-rendus du patient et génère en quelques secondes :</p>
+        <ul class="bullets">
+          <li>Synthèse des antécédents significatifs</li>
+          <li>Évolution des constantes vitales (tendances PA, FC, poids)</li>
+          <li>Liste des traitements en cours et durées</li>
+          <li>Points de vigilance (interactions, allergies, risques)</li>
+          <li>Recommandations de suivi</li>
+        </ul>
+        <div class="callout ai"><span class="callout-icon">✨</span> <div>Ce résumé est particulièrement utile lors d'une consultation de suivi ou avant un transfert vers un confrère. Il est généré à la demande et n'est jamais enregistré sans votre validation.</div></div>
+        <div class="callout info"><span class="callout-icon">ℹ️</span> <div>La fonctionnalité IA nécessite une clé API Anthropic configurée (<kbd>ANTHROPIC_API_KEY</kbd>). Sans elle, un message d'erreur s'affiche. Contactez votre administrateur système.</div></div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 6. CONSULTATION -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section class="section" id="consultation">
+      <div class="section-header">
+        <div class="section-icon">🩺</div>
+        <div>
+          <div class="section-num">Section 6</div>
+          <div class="section-title">Mode Consultation plein écran</div>
+        </div>
+      </div>
+
+      <div class="cards">
+        <div class="card">
+          <div class="card-title">À quoi ça sert</div>
+          <div class="card-body">Un espace de travail dédié pendant la consultation, sans distraction. Affiche le dossier patient, les vitaux et le formulaire de CR en même temps.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Comment y accéder</div>
+          <div class="card-body">Depuis la fiche patient, cliquez sur le bouton <strong>Consultation</strong> (icône stéthoscope). Toute l'interface se masque — seul le mode consultation reste visible.</div>
+        </div>
+      </div>
+
+      <div class="block-title">Fonctionnement</div>
+      <ol class="steps">
+        <li>Ouvrez la fiche du patient, cliquez sur <strong>Démarrer la consultation</strong>.</li>
+        <li>Le mode plein écran s'active — vous voyez le résumé patient à gauche et le formulaire de CR à droite.</li>
+        <li>Remplissez le CR (ou utilisez la dictée vocale depuis ce mode).</li>
+        <li>Cliquez <strong>Terminer la consultation</strong> pour revenir au tableau de bord normal. Le CR est automatiquement sauvegardé.</li>
+      </ol>
+      <div class="callout tip"><span class="callout-icon">💡</span> <div>Le mode consultation est idéal sur tablette ou second écran. Sur mobile, il occupe tout l'écran pour maximiser l'espace de saisie.</div></div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 7. FACTURATION -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section class="section" id="facturation">
+      <div class="section-header">
+        <div class="section-icon">💰</div>
+        <div>
+          <div class="section-num">Section 7</div>
+          <div class="section-title">Facturation &amp; Assurances</div>
+        </div>
+      </div>
+
+      <div class="sub" id="facturation-creer">
+        <div class="sub-title">7.A — Créer une facture</div>
+        <ol class="steps">
+          <li>Allez dans <strong>Facturation</strong> et cliquez sur <strong>+ Nouvelle facture</strong>.</li>
+          <li>Sélectionnez le <strong>patient</strong>. Son assureur est pré-rempli depuis son dossier.</li>
+          <li>Ajoutez les <strong>actes médicaux</strong> (consultation, ECG, ETT, Holter, biologie…) avec leur montant en FCFA.</li>
+          <li>Renseignez le <strong>mode de paiement</strong> (espèces, Wave CI, Mobile Money, chèque, virement).</li>
+          <li>Curaé calcule automatiquement la <strong>part assurance</strong> et la <strong>part patient</strong> selon les taux configurés.</li>
+          <li>Cliquez <strong>Enregistrer</strong>. Un numéro de facture est généré (ex : <kbd>FAC-2025-0089</kbd>).</li>
+        </ol>
+        <div class="callout tip"><span class="callout-icon">💡</span> <div>Vous pouvez filtrer la liste des factures par statut : <span class="tag green">Remboursé</span>, <span class="tag orange">En attente</span>, <span class="tag blue">Paiement direct</span>. Utilisez ce filtre pour votre relance mensuelle assureurs.</div></div>
+      </div>
+
+      <div class="sub" id="facturation-assureurs">
+        <div class="sub-title">7.B — Assureurs pris en charge</div>
+        <table>
+          <thead><tr><th>Assureur</th><th>Taux de remboursement (défaut)</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td><strong>NSIA Assurances</strong></td><td>70 – 80 %</td><td>Assureur le plus fréquent en CI</td></tr>
+            <tr><td><strong>Allianz Côte d'Ivoire</strong></td><td>70 – 80 %</td><td>Anciennement AGF</td></tr>
+            <tr><td><strong>AXA Assurances CI</strong></td><td>70 – 80 %</td><td>Pour salariés du secteur formel</td></tr>
+            <tr><td><strong>Sanlam Pan Africa</strong></td><td>70 – 80 %</td><td>Couverture panafricaine</td></tr>
+            <tr><td><strong>Aucun / Direct</strong></td><td>100 % patient</td><td>Paiement intégral par le patient</td></tr>
+          </tbody>
+        </table>
+        <div class="callout info"><span class="callout-icon">ℹ️</span> <div>Les taux de remboursement sont indicatifs. Ajustez le montant assurance manuellement si votre convention prévoit des taux différents pour certains actes.</div></div>
+      </div>
+
+      <div class="sub" id="facturation-export">
+        <div class="sub-title">7.C — Export CSV pour la comptabilité</div>
+        <ol class="steps">
+          <li>Dans la page Facturation, cliquez sur le bouton <strong>CSV</strong> dans la barre d'outils.</li>
+          <li>Le fichier est téléchargé immédiatement (nom : <kbd>curae_factures_2025-06-04.csv</kbd>).</li>
+          <li>Ouvrez avec <strong>Excel</strong> ou <strong>LibreOffice Calc</strong> — le séparateur est le point-virgule (;), compatible avec les versions françaises.</li>
+        </ol>
+        <p>Le CSV contient : numéro de facture, date, patient, assureur, montant total, part assurance, part patient, mode de paiement, statut, actes.</p>
+        <div class="callout tip"><span class="callout-icon">💡</span> <div>Exportez vos factures chaque fin de mois et archivez-les dans un dossier daté. C'est votre base comptable et justificatif pour les remboursements assureurs.</div></div>
+
+        <div class="block-title">Exports disponibles</div>
+        <table>
+          <thead><tr><th>Type</th><th>Contenu</th><th>Utilité</th></tr></thead>
+          <tbody>
+            <tr><td>Factures CSV</td><td>Toutes les factures avec statuts et montants</td><td>Comptabilité, remboursements assureurs</td></tr>
+            <tr><td>Patients CSV</td><td>Liste anonymisée des dossiers</td><td>Reporting, registre médical</td></tr>
+            <tr><td>RDV CSV</td><td>Historique des rendez-vous avec statuts</td><td>Analyse activité, taux de présence</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 8. WHATSAPP -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section class="section" id="whatsapp">
+      <div class="section-header">
+        <div class="section-icon">💬</div>
+        <div>
+          <div class="section-num">Section 8</div>
+          <div class="section-title">WhatsApp &amp; Communications patients</div>
+        </div>
+      </div>
+
+      <div class="cards">
+        <div class="card">
+          <div class="card-title">À quoi ça sert</div>
+          <div class="card-body">Envoyer des messages automatiques de confirmation, rappel ou résultats aux patients via leur numéro WhatsApp.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Prérequis technique</div>
+          <div class="card-body">Clé API WhatsApp Business (Meta for Developers). Sans elle, l'aperçu fonctionne mais les messages ne sont pas envoyés réellement.</div>
+        </div>
+      </div>
+
+      <div class="block-title">Types de messages disponibles</div>
+      <table>
+        <thead><tr><th>Type</th><th>Déclenché depuis</th><th>Contenu automatique</th></tr></thead>
+        <tbody>
+          <tr><td><span class="tag green">Confirmation RDV</span></td><td>Agenda (icône WhatsApp sur le RDV)</td><td>Date, heure, motif, adresse du cabinet</td></tr>
+          <tr><td><span class="tag blue">Rappel RDV</span></td><td>Agenda (icône WhatsApp sur le RDV)</td><td>Rappel 24h avant avec heure et lieu</td></tr>
+          <tr><td><span class="tag orange">Annulation RDV</span></td><td>Agenda (icône WhatsApp sur le RDV)</td><td>Notification d'annulation + invitation à replanifier</td></tr>
+          <tr><td><span class="tag purple">Résultat disponible</span></td><td>Fiche patient (bouton WhatsApp)</td><td>Notification que le CR / résultat est prêt</td></tr>
+        </tbody>
+      </table>
+
+      <div class="block-title">Processus d'envoi</div>
+      <ol class="steps">
+        <li>Cliquez sur l'icône WhatsApp (verte) à côté du RDV ou du patient.</li>
+        <li>Choisissez le type de message.</li>
+        <li>Lisez l'<strong>aperçu du message</strong> — il est pré-rempli mais modifiable.</li>
+        <li>Cliquez <strong>Envoyer via WhatsApp</strong>.</li>
+      </ol>
+      <div class="callout warn"><span class="callout-icon">⚠️</span> <div>Le numéro de téléphone du patient doit être au format international (ex : <kbd>+225 07 12 34 56</kbd>) et enregistré dans WhatsApp. Sans numéro valide, l'envoi échoue silencieusement.</div></div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 9. PARAMÈTRES -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section class="section" id="parametres">
+      <div class="section-header">
+        <div class="section-icon">⚙️</div>
+        <div>
+          <div class="section-num">Section 9</div>
+          <div class="section-title">Paramètres &amp; Profil</div>
+        </div>
+      </div>
+
+      <p>Accédez aux paramètres via le bouton <strong>Paramètres</strong> en bas de la barre latérale (icône engrenage) ou en cliquant sur votre avatar en haut de la sidebar.</p>
+
+      <div class="block-title">Ce que vous pouvez modifier</div>
+      <table>
+        <thead><tr><th>Rubrique</th><th>Champs modifiables</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Profil médecin</strong></td><td>Titre (Dr./Pr.), prénom, nom, spécialité, N° d'ordre médical</td></tr>
+          <tr><td><strong>Coordonnées</strong></td><td>E-mail professionnel, téléphone, ville, pays</td></tr>
+          <tr><td><strong>Cabinet</strong></td><td>Nom du cabinet, adresse complète</td></tr>
+          <tr><td><strong>Notifications</strong></td><td>Rappels RDV, alertes consultation, rapports hebdomadaires, mises à jour</td></tr>
+          <tr><td><strong>Apparence</strong></td><td>Thème de couleur (Vert médical, Bleu, Violet, Ardoise)</td></tr>
+        </tbody>
+      </table>
+
+      <div class="block-title">Enregistrer les modifications</div>
+      <ol class="steps">
+        <li>Modifiez les champs souhaités.</li>
+        <li>Cliquez sur le bouton <strong>Sauvegarder</strong> en haut à droite.</li>
+        <li>Une confirmation "✓ Sauvegardé" s'affiche pendant 3 secondes. Les données sont enregistrées en base — elles persistent après déconnexion.</li>
+      </ol>
+
+      <div class="callout info"><span class="callout-icon">ℹ️</span> <div>Le nom et la spécialité affichés dans les comptes-rendus PDF et les ordonnances sont ceux du profil. Assurez-vous qu'ils correspondent à votre identité médicale officielle.</div></div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 10. ABONNEMENT -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section class="section" id="abonnement">
+      <div class="section-header">
+        <div class="section-icon">💳</div>
+        <div>
+          <div class="section-num">Section 10</div>
+          <div class="section-title">Abonnement Curaé</div>
+        </div>
+      </div>
+
+      <table>
+        <thead><tr><th>Plan</th><th>Prix</th><th>Pour qui</th><th>Inclus</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Solo</strong></td>
+            <td>35 000 FCFA / mois</td>
+            <td>Médecin indépendant, cabinet solo</td>
+            <td>1 médecin, patients illimités, toutes les fonctionnalités</td>
+          </tr>
+          <tr>
+            <td><strong>Cabinet</strong></td>
+            <td>65 000 FCFA / mois</td>
+            <td>Clinique, cabinet de groupe</td>
+            <td>Médecins multiples, organisation partagée, statistiques consolidées</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="block-title">Paiement via Wave CI</div>
+      <ol class="steps">
+        <li>Sur le tableau de bord, cliquez sur <strong>Renouveler</strong> dans la bannière abonnement (visible 30 jours avant expiration).</li>
+        <li>Choisissez votre plan (Solo ou Cabinet).</li>
+        <li>Entrez votre numéro Wave CI et validez le paiement depuis votre application Wave.</li>
+        <li>L'abonnement est activé instantanément après confirmation du paiement.</li>
+      </ol>
+
+      <div class="callout info"><span class="callout-icon">ℹ️</span> <div><strong>Période d'essai :</strong> À la création du compte, vous bénéficiez de 30 jours d'essai gratuit — toutes les fonctionnalités sont disponibles, sans carte requise.</div></div>
+      <div class="callout warn"><span class="callout-icon">⚠️</span> <div>En cas d'expiration de l'abonnement, l'accès aux données est préservé mais les fonctionnalités avancées (IA, WhatsApp, exports) sont suspendues jusqu'au renouvellement.</div></div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 11. HORS LIGNE -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section class="section" id="offline">
+      <div class="section-header">
+        <div class="section-icon">📶</div>
+        <div>
+          <div class="section-num">Section 11</div>
+          <div class="section-title">Mode hors ligne</div>
+        </div>
+      </div>
+
+      <div class="cards">
+        <div class="card">
+          <div class="card-title">Fonctionnel sans connexion</div>
+          <div class="card-body">Consultation des données en cache, navigation entre pages, saisie de formulaires (mise en file d'attente).</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Nécessite une connexion</div>
+          <div class="card-body">Enregistrement définitif des données, génération IA, envoi WhatsApp, export CSV/PDF.</div>
+        </div>
+      </div>
+
+      <div class="block-title">Bannière de statut</div>
+      <p>Une bannière s'affiche automatiquement en haut de l'écran selon l'état de connexion :</p>
+      <ul class="bullets">
+        <li><strong style="color:#a06010;">🟡 Hors ligne</strong> — vos actions sont mises en file d'attente locale</li>
+        <li><strong style="color:#1a4a8a;">🔵 Synchronisation…</strong> — envoi des données en attente (spinner animé)</li>
+        <li><strong style="color:#0f6e56;">🟢 Synchronisé</strong> — toutes les données ont été enregistrées avec succès</li>
+      </ul>
+
+      <div class="block-title">Synchronisation automatique</div>
+      <p>Dès que la connexion revient, Curaé synchronise automatiquement toutes les actions effectuées hors ligne (création de patients, saisie de CRs, planification de RDV). Aucune action manuelle n'est nécessaire.</p>
+
+      <div class="callout tip"><span class="callout-icon">📱</span> <div>Installez Curaé comme application sur votre téléphone (PWA) : dans Chrome, cliquez sur l'icône d'installation dans la barre d'adresse. L'app fonctionne alors comme une vraie application native, même en zone de faible réseau.</div></div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- 12. FAQ -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section class="section" id="faq">
+      <div class="section-header">
+        <div class="section-icon">❓</div>
+        <div>
+          <div class="section-num">Section 12</div>
+          <div class="section-title">FAQ &amp; Problèmes fréquents</div>
+        </div>
+      </div>
+
+      <div class="block-title">Connexion &amp; Compte</div>
+      <table>
+        <thead><tr><th>Problème</th><th>Solution</th></tr></thead>
+        <tbody>
+          <tr><td>"Session expirée" au chargement</td><td>Reconnectez-vous normalement. Vos données sont conservées. La session dure 7 jours.</td></tr>
+          <tr><td>"Email déjà utilisé" à l'inscription</td><td>Cet e-mail a déjà un compte. Utilisez l'onglet Connexion.</td></tr>
+          <tr><td>"Identifiants incorrects"</td><td>Vérifiez la casse de votre mot de passe. Contactez votre admin si vous avez oublié le mot de passe.</td></tr>
+          <tr><td>Trop de tentatives bloquées</td><td>Le système bloque après 20 tentatives en 15 minutes. Attendez 15 min et réessayez.</td></tr>
+        </tbody>
+      </table>
+
+      <div class="block-title">Fonctionnalités</div>
+      <table>
+        <thead><tr><th>Problème</th><th>Solution</th></tr></thead>
+        <tbody>
+          <tr><td>La dictée vocale ne démarre pas</td><td>Autorisez le microphone dans le navigateur (icône cadenas dans la barre d'adresse). Utilisez Chrome ou Edge.</td></tr>
+          <tr><td>"Erreur serveur" lors de l'envoi IA</td><td>La clé ANTHROPIC_API_KEY n'est pas configurée sur le serveur. Contactez l'administrateur.</td></tr>
+          <tr><td>Le WhatsApp ne s'envoie pas</td><td>Vérifiez que le numéro du patient est au format international (+225…) et que l'API WhatsApp est configurée.</td></tr>
+          <tr><td>Export CSV vide ou erreur 401</td><td>Reconnectez-vous puis réessayez. Si le problème persiste, rafraîchissez la page.</td></tr>
+          <tr><td>Le PDF ne se génère pas</td><td>Autorisez les pop-ups pour ce site dans votre navigateur.</td></tr>
+          <tr><td>Les données du tableau de bord sont en mode démo</td><td>Le backend n'est pas accessible. Vérifiez votre connexion internet et que le serveur est démarré.</td></tr>
+        </tbody>
+      </table>
+
+      <div class="block-title">Performances &amp; Mobile</div>
+      <table>
+        <thead><tr><th>Situation</th><th>Recommandation</th></tr></thead>
+        <tbody>
+          <tr><td>App lente sur mobile 3G</td><td>Installez l'app en PWA (icône + dans Chrome). Le cache local accélère le chargement.</td></tr>
+          <tr><td>Sidebar non visible sur mobile</td><td>Cliquez sur le bouton ☰ en haut à gauche. La barre de navigation en bas donne accès aux 5 pages principales.</td></tr>
+          <tr><td>Guide de prise en main disparu</td><td>Cliquez sur le bouton ? vert en bas à droite de l'écran pour le rouvrir à tout moment.</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout tip"><span class="callout-icon">📞</span> <div><strong>Besoin d'aide supplémentaire ?</strong> Contactez le support Curaé via WhatsApp ou par e-mail. Précisez votre nom de cabinet et décrivez le problème avec une capture d'écran si possible.</div></div>
+
+      <!-- Footer -->
+      <div class="divider">Fin du guide</div>
+      <div style="text-align:center; padding: 20px 0 40px; color: var(--muted); font-size: 13px;">
+        <strong style="color: var(--accent);">Curaé</strong> v1.0.0 — Cabinet médical · Côte d'Ivoire<br>
+        <span style="font-size:12px;">Ce guide est mis à jour à chaque version. Dernière révision : juin 2026.</span><br><br>
+        <a href="/" style="color: var(--accent); font-weight: 700; text-decoration: none;">← Retour à l'application</a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  // Highlight active nav link on scroll
+  const sections = document.querySelectorAll('.section, .sub');
+  const navLinks  = document.querySelectorAll('.nav-link, .nav-sub');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        navLinks.forEach(link => {
+          link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -75% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
