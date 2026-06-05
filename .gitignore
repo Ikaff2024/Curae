@@ -34,3 +34,8 @@ Thumbs.db
 
 # TypeScript
 *.tsbuildinfo
+
+# Fichiers de test / vérification locale
+screenshots/
+verify.mjs
+package-lock.json

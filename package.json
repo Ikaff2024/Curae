@@ -1,0 +1,14 @@
+{
+  "name": "curae",
+  "version": "1.0.0",
+  "description": "Curaé — Logiciel de gestion de cabinet médical (Côte d'Ivoire)",
+  "scripts": {
+    "build": "cd backend && npm ci && npm run build",
+    "start": "cd backend && node dist/index.js",
+    "dev": "cd backend && npm run dev"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=9.0.0"
+  }
+}
